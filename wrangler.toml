@@ -1,0 +1,8 @@
+name = "my-calendar"
+compatibility_date = "2024-03-09"
+pages_build_output_dir = "dist"
+
+[[ d1_databases ]]
+binding = "DB"
+database_name = "my-calendar-db"
+database_id = "9ff7e0a4-6c49-4183-98c3-1801a2a059de"

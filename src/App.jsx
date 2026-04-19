@@ -58,7 +58,7 @@ const defaultForm = {
   allDay: false, color: "cyan", repeat: "none", memo: ""
 };
 
-const F = "'BIZ UDPGothic','Hiragino Kaku Gothic ProN','Meiryo',sans-serif";
+const F = "'Noto Sans JP','Hiragino Kaku Gothic ProN','Meiryo',sans-serif";
 
 export default function CalendarDark() {
   const today = new Date();
@@ -178,16 +178,14 @@ export default function CalendarDark() {
     else { setSelected(ds); setDetailEv(null); }
   };
 
-  const panelVisible = selected !== null;
-
   return (
-    <div style={{ minHeight:"100vh", background:"#0e0e0e", color:"#e8e8e8", fontFamily:F, display:"flex", flexDirection:"column" }}>
+    <div style={{ minHeight:"100vh", background:"#0e0e0e", color:"#e8e8e8", fontFamily:F, display:"flex", flexDirection:"column", paddingBottom: selected ? "220px" : "0", transition:"padding-bottom .3s ease" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
         *{box-sizing:border-box;margin:0;padding:0}
         ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#1a1a1a}::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
 
-        .cell-day{border-radius:4px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:background .12s;font-family:'BIZ UDPGothic','Hiragino Kaku Gothic ProN','Meiryo',sans-serif;font-weight:400}
+        .cell-day{border-radius:4px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:background .12s;font-family:'Noto Sans JP','Hiragino Kaku Gothic ProN','Meiryo',sans-serif;font-weight:400}
         .cell-day:hover{background:#1f1f1f}
         .cell-day.today{background:#e8e8e8;color:#0e0e0e;font-weight:700}
         .cell-day.selected{outline:1.5px solid #555}
@@ -197,10 +195,10 @@ export default function CalendarDark() {
         .dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
 
         .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
-        .modal-box{background:#141414;border:1px solid #2a2a2a;border-radius:12px;padding:26px 26px 22px;width:380px;max-width:95vw;box-shadow:0 24px 64px rgba(0,0,0,.6)}
+        .modal-box{background:#141414;border:1px solid #2a2a2a;border-radius:12px;padding:26px 26px 22px;width:380px;max-width:95vw;box-shadow:0 24px 64px rgba(0,0,0,.6);max-height:90vh;overflow-y:auto}
 
         .form-label{font-size:11px;color:#666;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;display:block;font-weight:700}
-        .form-input{width:100%;border:1px solid #2a2a2a;border-radius:6px;padding:9px 11px;font-size:14px;color:#e8e8e8;background:#1a1a1a;font-family:'BIZ UDPGothic','Hiragino Kaku Gothic ProN','Meiryo',sans-serif;outline:none;transition:border .12s;font-weight:400}
+        .form-input{width:100%;border:1px solid #2a2a2a;border-radius:6px;padding:9px 11px;font-size:14px;color:#e8e8e8;background:#1a1a1a;font-family:'Noto Sans JP','Hiragino Kaku Gothic ProN','Meiryo',sans-serif;outline:none;transition:border .12s;font-weight:400}
         .form-input:focus{border-color:#555}
         .form-input::placeholder{color:#3a3a3a}
         input[type=date].form-input::-webkit-calendar-picker-indicator{filter:invert(.4)}
@@ -209,11 +207,11 @@ export default function CalendarDark() {
         .color-swatch{width:26px;height:26px;border-radius:4px;cursor:pointer;border:2px solid transparent;transition:transform .1s,border-color .1s}
         .color-swatch.active{border-color:#fff;transform:scale(1.1)}
 
-        .tag-btn{padding:5px 12px;border-radius:4px;border:1px solid #2a2a2a;font-size:12px;cursor:pointer;background:none;color:#888;font-family:'BIZ UDPGothic','Hiragino Kaku Gothic ProN','Meiryo',sans-serif;transition:all .1s;font-weight:400}
+        .tag-btn{padding:5px 12px;border-radius:4px;border:1px solid #2a2a2a;font-size:12px;cursor:pointer;background:none;color:#888;font-family:'Noto Sans JP','Hiragino Kaku Gothic ProN','Meiryo',sans-serif;transition:all .1s;font-weight:400}
         .tag-btn.active{background:#e8e8e8;color:#0e0e0e;border-color:#e8e8e8;font-weight:700}
         .tag-btn:hover:not(.active){border-color:#444;color:#ccc}
 
-        .save-btn{width:100%;padding:12px;border-radius:6px;border:none;background:#e8e8e8;color:#0e0e0e;font-size:14px;cursor:pointer;font-family:'BIZ UDPGothic','Hiragino Kaku Gothic ProN','Meiryo',sans-serif;letter-spacing:.04em;font-weight:700;transition:opacity .13s}
+        .save-btn{width:100%;padding:12px;border-radius:6px;border:none;background:#e8e8e8;color:#0e0e0e;font-size:14px;cursor:pointer;font-family:'Noto Sans JP','Hiragino Kaku Gothic ProN','Meiryo',sans-serif;letter-spacing:.04em;font-weight:700;transition:opacity .13s}
         .save-btn:hover{opacity:.85}
         .cancel-link{display:block;text-align:center;margin-top:10px;font-size:13px;color:#444;cursor:pointer;font-weight:400}
         .cancel-link:hover{color:#888}
@@ -226,12 +224,10 @@ export default function CalendarDark() {
         .nav-btn{width:34px;height:34px;border-radius:4px;border:1px solid #2a2a2a;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:#666;transition:all .12s}
         .nav-btn:hover{border-color:#444;color:#ccc}
 
-        .ev-row{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:6px;cursor:pointer;margin-bottom:6px;transition:background .1s;border:1px solid #1c1c1c}
-        .ev-row:hover{background:#181818;border-color:#2a2a2a}
+        .ev-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:6px;cursor:pointer;margin-bottom:6px;transition:background .1s;border:1px solid #1c1c1c}
+        .ev-row:hover{background:#1a1a1a;border-color:#2a2a2a}
 
-        .detail-box{background:#0e0e0e;border-radius:8px;padding:16px;border:1px solid #2a2a2a}
-
-        .top-action-btn{padding:5px 13px;border-radius:4px;border:1px solid #2a2a2a;background:none;cursor:pointer;font-size:12px;color:#666;font-family:'BIZ UDPGothic','Hiragino Kaku Gothic ProN','Meiryo',sans-serif;letter-spacing:.04em;transition:all .12s;font-weight:700}
+        .top-action-btn{padding:5px 13px;border-radius:4px;border:1px solid #2a2a2a;background:none;cursor:pointer;font-size:12px;color:#666;font-family:'Noto Sans JP','Hiragino Kaku Gothic ProN','Meiryo',sans-serif;letter-spacing:.04em;transition:all .12s;font-weight:700}
         .top-action-btn:hover{border-color:#444;color:#ccc;background:#1a1a1a}
 
         .hamburger-btn{width:32px;height:28px;border-radius:4px;border:1px solid #2a2a2a;background:none;cursor:pointer;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;transition:all .12s;padding:0}
@@ -240,7 +236,7 @@ export default function CalendarDark() {
         .hamburger-btn:hover span{background:#ccc}
 
         .dropdown{position:absolute;top:calc(100% + 6px);right:0;background:#141414;border:1px solid #2a2a2a;border-radius:8px;overflow:hidden;z-index:200;min-width:148px;box-shadow:0 8px 32px rgba(0,0,0,.5)}
-        .menu-item{display:block;width:100%;padding:10px 16px;background:none;border:none;text-align:left;font-size:12px;color:#888;font-family:'BIZ UDPGothic','Hiragino Kaku Gothic ProN','Meiryo',sans-serif;letter-spacing:.04em;cursor:pointer;transition:background .1s,color .1s;font-weight:400}
+        .menu-item{display:block;width:100%;padding:10px 16px;background:none;border:none;text-align:left;font-size:12px;color:#888;font-family:'Noto Sans JP','Hiragino Kaku Gothic ProN','Meiryo',sans-serif;letter-spacing:.04em;cursor:pointer;transition:background .1s,color .1s;font-weight:400}
         .menu-item:hover{background:#1f1f1f;color:#e8e8e8}
 
         .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#e8e8e8;color:#0e0e0e;padding:9px 20px;border-radius:6px;font-size:13px;letter-spacing:.03em;z-index:200;animation:fadeup .2s ease;pointer-events:none;font-weight:700}
@@ -250,26 +246,33 @@ export default function CalendarDark() {
         textarea.form-input{resize:vertical;min-height:60px;line-height:1.7}
         .loading-spinner{display:flex;align-items:center;justify-content:center;height:200px;color:#333;font-size:13px;letter-spacing:.08em}
 
-        /* Bottom panel */
+        /* Fixed bottom panel */
         .bottom-panel{
-          border-top:1px solid #1c1c1c;
+          position:fixed;
+          bottom:0; left:0; right:0;
           background:#141414;
-          overflow:hidden;
-          transition:max-height .3s ease, opacity .3s ease;
-          max-height:0;
-          opacity:0;
+          border-top:1px solid #2a2a2a;
+          z-index:50;
+          transform:translateY(100%);
+          transition:transform .3s ease;
+          box-shadow:0 -8px 32px rgba(0,0,0,.5);
+          max-height:50vh;
+          overflow-y:auto;
         }
         .bottom-panel.open{
-          max-height:500px;
-          opacity:1;
+          transform:translateY(0);
         }
 
         .add-fab{
-          width:40px;height:40px;border-radius:50%;border:1px solid #2a2a2a;
+          width:36px;height:36px;border-radius:50%;border:1px solid #2a2a2a;
           background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
-          font-size:22px;color:#666;transition:all .12s;
+          font-size:22px;color:#888;transition:all .12s;line-height:1;
         }
         .add-fab:hover{border-color:#444;color:#ccc;background:#1a1a1a}
+
+        .panel-handle{
+          width:36px;height:4px;background:#2a2a2a;border-radius:2px;margin:10px auto 0;cursor:pointer;
+        }
       `}</style>
 
       {/* Header */}
@@ -296,23 +299,20 @@ export default function CalendarDark() {
 
       {/* Calendar */}
       <div style={{ flex:1, padding:"22px 24px 0", maxWidth:700, margin:"0 auto", width:"100%" }}>
-        {/* Month nav */}
         <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:20 }}>
           <button className="nav-btn" onClick={prevMonth}>‹</button>
-          <div style={{ flex:1, textAlign:"center", fontSize:15, letterSpacing:"0.12em", color:"#aaa", fontWeight:700 }}>
+          <div style={{ flex:1, textAlign:"center", fontSize:15, letterSpacing:"0.1em", color:"#aaa", fontWeight:700 }}>
             {MONTH_NAMES[viewMonth]} {viewYear}
           </div>
           <button className="nav-btn" onClick={nextMonth}>›</button>
         </div>
 
-        {/* Day headers */}
         <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", marginBottom:8 }}>
           {DAY_NAMES.map((d, i) => (
-            <div key={d} style={{ textAlign:"center", fontSize:11, color:i===0?"#ff3b3b":i===6?"#00e5ff":"#444", letterSpacing:"0.08em", padding:"2px 0", fontWeight:700 }}>{d}</div>
+            <div key={d} style={{ textAlign:"center", fontSize:11, color:i===0?"#ff3b3b":i===6?"#00e5ff":"#444", letterSpacing:"0.06em", padding:"2px 0", fontWeight:700 }}>{d}</div>
           ))}
         </div>
 
-        {/* Grid */}
         {loading ? (
           <div className="loading-spinner">LOADING...</div>
         ) : (
@@ -342,70 +342,64 @@ export default function CalendarDark() {
         )}
       </div>
 
-      {/* Bottom Panel */}
-      <div style={{ maxWidth:700, margin:"0 auto", width:"100%", marginTop:16 }}>
-        <div className={`bottom-panel${panelVisible?" open":""}`}>
-          <div style={{ padding:"16px 24px 20px" }}>
-            {selected && (
-              <>
-                {/* Panel header */}
-                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:14 }}>
-                  <div style={{ fontSize:13, color:"#555", letterSpacing:"0.08em", fontWeight:700 }}>
-                    {selected.replace(/-/g,".")}
+      {/* Fixed Bottom Panel */}
+      <div className={`bottom-panel${selected ? " open" : ""}`}>
+        <div onClick={() => { setSelected(null); setDetailEv(null); }}>
+          <div className="panel-handle" />
+        </div>
+        {selected && (
+          <div style={{ padding:"12px 20px 24px" }}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                {detailEv && (
+                  <button className="icon-btn" onClick={() => setDetailEv(null)} style={{ fontSize:12, color:"#555", width:"auto", padding:"0 8px" }}>← back</button>
+                )}
+                <div style={{ fontSize:13, color:"#555", letterSpacing:"0.08em", fontWeight:700 }}>
+                  {selected.replace(/-/g,".")}
+                </div>
+              </div>
+              <button className="add-fab" onClick={() => openAdd(selected)} title="追加">+</button>
+            </div>
+
+            {detailEv ? (
+              <div style={{ background:"#0e0e0e", borderRadius:8, padding:14, border:"1px solid #2a2a2a" }}>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10 }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:7 }}>
+                    <div style={{ width:8, height:8, borderRadius:"50%", background:getColor(detailEv.color).dark, boxShadow:`0 0 6px ${getColor(detailEv.color).dark}88` }} />
+                    <span style={{ fontSize:11, color:"#555" }}>{REPEATS.find(r=>r.id===detailEv.repeat)?.label}</span>
                   </div>
-                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                    {detailEv && (
-                      <button className="icon-btn" style={{ fontSize:12, color:"#555" }} onClick={() => setDetailEv(null)}>← back</button>
-                    )}
-                    <button className="add-fab" onClick={() => openAdd(selected)} title="追加">+</button>
+                  <div style={{ display:"flex", gap:5 }}>
+                    <button className="icon-btn" onClick={() => openEdit(detailEv)}>✎</button>
+                    <button className="icon-btn del" onClick={() => setDelConfirm(detailEv.id)}>✕</button>
                   </div>
                 </div>
-
-                {/* Detail view */}
-                {detailEv ? (
-                  <div className="detail-box">
-                    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10 }}>
-                      <div style={{ display:"flex", alignItems:"center", gap:7 }}>
-                        <div style={{ width:8, height:8, borderRadius:"50%", background:getColor(detailEv.color).dark, boxShadow:`0 0 6px ${getColor(detailEv.color).dark}88` }} />
-                        <span style={{ fontSize:11, color:"#555", letterSpacing:"0.04em" }}>{REPEATS.find(r=>r.id===detailEv.repeat)?.label}</span>
-                      </div>
-                      <div style={{ display:"flex", gap:5 }}>
-                        <button className="icon-btn" onClick={() => openEdit(detailEv)}>✎</button>
-                        <button className="icon-btn del" onClick={() => setDelConfirm(detailEv.id)}>✕</button>
-                      </div>
-                    </div>
-                    <div style={{ fontSize:16, color:"#e8e8e8", fontWeight:700, marginBottom:5, lineHeight:1.5 }}>{detailEv.title}</div>
-                    <div style={{ fontSize:12, color:"#555", marginBottom: detailEv.memo ? 8 : 0 }}>
-                      {fmtTime(detailEv)}
-                    </div>
-                    {detailEv.memo && (
-                      <div style={{ fontSize:13, color:"#777", borderTop:"1px solid #1c1c1c", paddingTop:8, lineHeight:1.8, marginTop:4 }}>{detailEv.memo}</div>
-                    )}
-                  </div>
-                ) : (
-                  /* Event list */
-                  <div>
-                    {selectedEvents.map(ev => {
-                      const c = getColor(ev.color);
-                      return (
-                        <div key={ev.id} className="ev-row" onClick={() => setDetailEv(ev)}>
-                          <div style={{ width:3, borderRadius:2, background:c.dark, alignSelf:"stretch", flexShrink:0, boxShadow:`0 0 4px ${c.dark}66` }} />
-                          <div style={{ flex:1, minWidth:0 }}>
-                            <div style={{ fontSize:14, color:"#ccc", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", fontWeight:700 }}>{ev.title}</div>
-                            <div style={{ fontSize:11, color:"#444", marginTop:2 }}>
-                              {fmtTime(ev)}
-                              {ev.repeat !== "none" && <span style={{ marginLeft:6, color:"#333" }}>↻ {REPEATS.find(r=>r.id===ev.repeat)?.label}</span>}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                <div style={{ fontSize:16, color:"#e8e8e8", fontWeight:700, marginBottom:5, lineHeight:1.5 }}>{detailEv.title}</div>
+                <div style={{ fontSize:12, color:"#555", marginBottom: detailEv.memo ? 8 : 0 }}>{fmtTime(detailEv)}</div>
+                {detailEv.memo && (
+                  <div style={{ fontSize:13, color:"#777", borderTop:"1px solid #1c1c1c", paddingTop:8, lineHeight:1.8, marginTop:4 }}>{detailEv.memo}</div>
                 )}
-              </>
+              </div>
+            ) : (
+              <div>
+                {selectedEvents.map(ev => {
+                  const c = getColor(ev.color);
+                  return (
+                    <div key={ev.id} className="ev-row" onClick={() => setDetailEv(ev)}>
+                      <div style={{ width:3, borderRadius:2, background:c.dark, alignSelf:"stretch", flexShrink:0, boxShadow:`0 0 4px ${c.dark}66` }} />
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ fontSize:14, color:"#ccc", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", fontWeight:700 }}>{ev.title}</div>
+                        <div style={{ fontSize:11, color:"#444", marginTop:2 }}>
+                          {fmtTime(ev)}
+                          {ev.repeat !== "none" && <span style={{ marginLeft:6, color:"#333" }}>↻ {REPEATS.find(r=>r.id===ev.repeat)?.label}</span>}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </div>
-        </div>
+        )}
       </div>
 
       {/* Add/Edit Modal */}
@@ -415,17 +409,14 @@ export default function CalendarDark() {
             <div style={{ fontSize:16, color:"#e8e8e8", fontWeight:700, marginBottom:20, letterSpacing:"0.04em" }}>
               {modal === "add" ? "予定を追加" : "予定を編集"}
             </div>
-
             <div style={{ marginBottom:13 }}>
               <label className="form-label">TITLE</label>
               <input className="form-input" value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} placeholder="イベントタイトル" autoFocus />
             </div>
-
             <div style={{ marginBottom:13 }}>
               <label className="form-label">DATE</label>
               <input className="form-input" type="date" value={form.date} onChange={e=>setForm(f=>({...f,date:e.target.value}))} />
             </div>
-
             {!form.allDay && (
               <div style={{ display:"flex", gap:9, marginBottom:13 }}>
                 <div style={{ flex:1 }}>
@@ -438,14 +429,12 @@ export default function CalendarDark() {
                 </div>
               </div>
             )}
-
             <div style={{ marginBottom:13 }}>
               <label style={{ display:"flex", alignItems:"center", gap:7, cursor:"pointer", fontSize:13, color:"#666", fontWeight:400 }}>
                 <input type="checkbox" checked={form.allDay} onChange={e=>setForm(f=>({...f,allDay:e.target.checked}))} style={{ accentColor:"#e8e8e8", width:14, height:14 }} />
                 終日
               </label>
             </div>
-
             <div style={{ marginBottom:13 }}>
               <label className="form-label">REPEAT</label>
               <div style={{ display:"flex", gap:5, flexWrap:"wrap", marginTop:4 }}>
@@ -454,7 +443,6 @@ export default function CalendarDark() {
                 ))}
               </div>
             </div>
-
             <div style={{ marginBottom:16 }}>
               <label className="form-label">COLOR</label>
               <div style={{ display:"flex", gap:7, marginTop:5 }}>
@@ -465,12 +453,10 @@ export default function CalendarDark() {
                 ))}
               </div>
             </div>
-
             <div style={{ marginBottom:20 }}>
               <label className="form-label">MEMO</label>
               <textarea className="form-input" value={form.memo} onChange={e=>setForm(f=>({...f,memo:e.target.value}))} placeholder="メモ（任意）" />
             </div>
-
             <button className="save-btn" onClick={handleSave}>保存する</button>
             <span className="cancel-link" onClick={closeModal}>キャンセル</span>
           </div>

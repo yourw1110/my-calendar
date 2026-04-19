@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="80" fill="#0e0e0e"/>
+
+  <!-- Header bar -->
+  <rect x="0" y="0" width="512" height="120" rx="80" fill="#1a1a1a"/>
+  <rect x="0" y="80" width="512" height="40" fill="#1a1a1a"/>
+
+  <!-- Ring hooks -->
+  <rect x="155" y="0" width="36" height="60" rx="18" fill="#444"/>
+  <rect x="321" y="0" width="36" height="60" rx="18" fill="#444"/>
+
+  <!-- Header accent dots -->
+  <circle cx="196" cy="90" r="6" fill="#00e5ff"/>
+  <circle cx="256" cy="90" r="6" fill="#444"/>
+  <circle cx="316" cy="90" r="6" fill="#444"/>
+
+  <!-- Grid lines horizontal -->
+  <line x1="30" y1="190" x2="482" y2="190" stroke="#333" stroke-width="2"/>
+  <line x1="30" y1="255" x2="482" y2="255" stroke="#333" stroke-width="2"/>
+  <line x1="30" y1="320" x2="482" y2="320" stroke="#333" stroke-width="2"/>
+  <line x1="30" y1="385" x2="482" y2="385" stroke="#333" stroke-width="2"/>
+  <line x1="30" y1="450" x2="482" y2="450" stroke="#333" stroke-width="2"/>
+
+  <!-- Grid lines vertical -->
+  <line x1="96"  y1="145" x2="96"  y2="480" stroke="#333" stroke-width="2"/>
+  <line x1="161" y1="145" x2="161" y2="480" stroke="#333" stroke-width="2"/>
+  <line x1="226" y1="145" x2="226" y2="480" stroke="#333" stroke-width="2"/>
+  <line x1="291" y1="145" x2="291" y2="480" stroke="#333" stroke-width="2"/>
+  <line x1="356" y1="145" x2="356" y2="480" stroke="#333" stroke-width="2"/>
+  <line x1="421" y1="145" x2="421" y2="480" stroke="#333" stroke-width="2"/>
+
+  <!-- Today highlight -->
+  <rect x="168" y="200" width="52" height="48" rx="10" fill="#e8e8e8"/>
+
+  <!-- Event dots -->
+  <circle cx="258" cy="300" r="7" fill="#ff3b3b"/>
+  <circle cx="278" cy="300" r="7" fill="#00e676"/>
+  <circle cx="63"  cy="365" r="7" fill="#e040fb"/>
+  <circle cx="388" cy="235" r="7" fill="#00e5ff"/>
+  <circle cx="323" cy="430" r="7" fill="#ff8c00"/>
+  <circle cx="343" cy="430" r="7" fill="#ffe600"/>
+</svg>

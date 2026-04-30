@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-calendar-v1';
+const CACHE_NAME = 'my-calendar-v1-5';
 const STATIC_ASSETS = ['/', '/index.html'];
 
 self.addEventListener('install', (e) => {

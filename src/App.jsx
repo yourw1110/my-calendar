@@ -333,7 +333,7 @@ export default function CalendarDark() {
                   <div className="task-list">
                     {dayEvs.slice(0, 3).map(e => (
                       <div key={e.id} className="task-badge" style={{ background: getColor(e.color).bg }}>
-                        {e.title.substring(0, 4)}
+                        {e.title.substring(0, 5)}
                       </div>
                     ))}
                     {dayEvs.length > 3 && (

@@ -191,8 +191,8 @@ export default function CalendarDark() {
         .cell-day.selected{outline:1.5px solid #555}
         .cell-day.today.selected{outline:1.5px solid #aaa}
 
-        .dot-row{display:flex;gap:2px;justify-content:center;min-height:5px;margin-top:3px}
-        .dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+        .task-list{display:flex;flex-direction:column;gap:1px;width:100%;margin-top:2px;padding:0 2px}
+        .task-badge{font-size:9px;padding:1px 3px;border-radius:2px;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;line-height:1.2;font-weight:700}
 
         .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
         .modal-box{background:#141414;border:1px solid #2a2a2a;border-radius:12px;padding:26px 26px 22px;width:380px;max-width:95vw;box-shadow:0 24px 64px rgba(0,0,0,.6);max-height:90vh;overflow-y:auto}
@@ -323,17 +323,22 @@ export default function CalendarDark() {
               const isToday = ds === todayStr;
               const isSel   = ds === selected;
               const dayEvs  = events.filter(e => eventOccursOnDate(e, ds));
-              const dots    = dayEvs.slice(0, 4).map(e => getColor(e.color).dark);
               const wd      = (firstDay + day - 1) % 7;
               return (
-                <div key={ds} style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"2px 0" }} onClick={() => handleDayClick(ds)}>
+                <div key={ds} style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"2px 0", minHeight:64, borderTop:"1px solid #1c1c1c" }} onClick={() => handleDayClick(ds)}>
                   <div className={`cell-day${isToday?" today":""}${isSel?" selected":""}`}
                     style={{ color: isToday ? undefined : isSel ? "#e8e8e8" : wd===0?"#993333":wd===6?"#006666":"#aaa" }}>
                     {day}
                   </div>
-                  <div className="dot-row">
-                    {dots.map((c, di) => <div key={di} className="dot" style={{ background:c }} />)}
-                    {dayEvs.length > 4 && <span style={{ fontSize:7, color:"#444" }}>+</span>}
+                  <div className="task-list">
+                    {dayEvs.slice(0, 3).map(e => (
+                      <div key={e.id} className="task-badge" style={{ background: getColor(e.color).bg }}>
+                        {e.title}
+                      </div>
+                    ))}
+                    {dayEvs.length > 3 && (
+                      <div style={{ fontSize:8, color:"#444", textAlign:"center" }}>+{dayEvs.length - 3}</div>
+                    )}
                   </div>
                 </div>
               );

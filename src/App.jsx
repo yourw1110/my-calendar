@@ -192,7 +192,7 @@ export default function CalendarDark() {
         .cell-day.today.selected{outline:1.5px solid #aaa}
 
         .task-list{display:flex;flex-direction:column;gap:2px;width:100%;margin-top:2px;padding:0 2px}
-        .task-badge{font-size:10.5px;padding:2px 4px;border-radius:3px;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;line-height:1.2;font-weight:700;letter-spacing:-0.02em}
+        .task-badge{font-size:10.5px;padding:2px 4px;border-radius:3px;color:#000;white-space:nowrap;overflow:hidden;width:100%;line-height:1.2;font-weight:700;letter-spacing:-0.02em}
 
         .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
         .modal-box{background:#141414;border:1px solid #2a2a2a;border-radius:12px;padding:26px 26px 22px;width:380px;max-width:95vw;box-shadow:0 24px 64px rgba(0,0,0,.6);max-height:90vh;overflow-y:auto}
@@ -333,7 +333,7 @@ export default function CalendarDark() {
                   <div className="task-list">
                     {dayEvs.slice(0, 3).map(e => (
                       <div key={e.id} className="task-badge" style={{ background: getColor(e.color).bg }}>
-                        {e.title}
+                        {e.title.substring(0, 4)}
                       </div>
                     ))}
                     {dayEvs.length > 3 && (

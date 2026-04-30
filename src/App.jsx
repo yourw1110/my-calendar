@@ -191,8 +191,8 @@ export default function CalendarDark() {
         .cell-day.selected{outline:1.5px solid #555}
         .cell-day.today.selected{outline:1.5px solid #aaa}
 
-        .task-list{display:flex;flex-direction:column;gap:1px;width:100%;margin-top:2px;padding:0 2px}
-        .task-badge{font-size:9px;padding:1px 3px;border-radius:2px;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;line-height:1.2;font-weight:700}
+        .task-list{display:flex;flex-direction:column;gap:2px;width:100%;margin-top:2px;padding:0 2px}
+        .task-badge{font-size:10.5px;padding:2px 4px;border-radius:3px;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;line-height:1.2;font-weight:700;letter-spacing:-0.02em}
 
         .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
         .modal-box{background:#141414;border:1px solid #2a2a2a;border-radius:12px;padding:26px 26px 22px;width:380px;max-width:95vw;box-shadow:0 24px 64px rgba(0,0,0,.6);max-height:90vh;overflow-y:auto}
@@ -298,7 +298,7 @@ export default function CalendarDark() {
       </div>
 
       {/* Calendar */}
-      <div style={{ flex:1, padding:"22px 24px 0", maxWidth:700, margin:"0 auto", width:"100%" }}>
+      <div style={{ flex:1, padding:"22px 24px 0", maxWidth:500, margin:"0 auto", width:"100%" }}>
         <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:20 }}>
           <button className="nav-btn" onClick={prevMonth}>‹</button>
           <div style={{ flex:1, textAlign:"center", fontSize:15, letterSpacing:"0.1em", color:"#aaa", fontWeight:700 }}>
@@ -325,7 +325,7 @@ export default function CalendarDark() {
               const dayEvs  = events.filter(e => eventOccursOnDate(e, ds));
               const wd      = (firstDay + day - 1) % 7;
               return (
-                <div key={ds} style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"2px 0", minHeight:64, borderTop:"1px solid #1c1c1c" }} onClick={() => handleDayClick(ds)}>
+                <div key={ds} style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"4px 0", minHeight:80, borderTop:"1px solid #1c1c1c" }} onClick={() => handleDayClick(ds)}>
                   <div className={`cell-day${isToday?" today":""}${isSel?" selected":""}`}
                     style={{ color: isToday ? undefined : isSel ? "#e8e8e8" : wd===0?"#993333":wd===6?"#006666":"#aaa" }}>
                     {day}

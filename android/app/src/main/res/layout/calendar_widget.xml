@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#141414"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="4dp">
+        <TextView
+            android:id="@+id/widget_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="2026.04"
+            android:textColor="#888888"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="4dp">
+        <!-- 曜日ヘッダー -->
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="S" android:textColor="#993333" android:textSize="9sp" android:gravity="center" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="M" android:textColor="#444444" android:textSize="9sp" android:gravity="center" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="T" android:textColor="#444444" android:textSize="9sp" android:gravity="center" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="W" android:textColor="#444444" android:textSize="9sp" android:gravity="center" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="T" android:textColor="#444444" android:textSize="9sp" android:gravity="center" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="F" android:textColor="#444444" android:textSize="9sp" android:gravity="center" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="S" android:textColor="#006666" android:textSize="9sp" android:gravity="center" />
+    </LinearLayout>
+
+    <!-- カレンダー本体（文字列として1枚のTextViewで表示する手法が安定します） -->
+    <TextView
+        android:id="@+id/calendar_grid_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text=" 1  2  3  4  5  6  7\n 8  9 10 11 12 13 14..."
+        android:textColor="#E8E8E8"
+        android:textSize="14sp"
+        android:typeface="monospace"
+        android:gravity="center_horizontal"
+        android:lineSpacingExtra="4dp" />
+</LinearLayout>

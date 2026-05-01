@@ -36,7 +36,9 @@ function eventOccursOnDate(event, dateStr) {
   return false;
 }
 
-const API = "/api/events";
+const API = (typeof window !== 'undefined' && (window.location.origin.includes('file://') || window.location.hostname === 'localhost'))
+  ? "https://calendar.yuatoz.com/api/events" 
+  : "/api/events";
 async function apiGet() {
   const r = await fetch(API);
   if (!r.ok) throw new Error("fetch failed");
@@ -179,7 +181,7 @@ export default function CalendarDark() {
   };
 
   return (
-    <div style={{ minHeight:"100vh", background:"#0e0e0e", color:"#e8e8e8", fontFamily:F, display:"flex", flexDirection:"column", paddingBottom: selected ? "220px" : "0", transition:"padding-bottom .3s ease" }}>
+    <div style={{ minHeight:"100vh", background:"#0e0e0e", color:"#e8e8e8", fontFamily:F, display:"flex", flexDirection:"column", paddingBottom: selected ? "220px" : "0", paddingTop: "30px", transition:"padding-bottom .3s ease" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
         *{box-sizing:border-box;margin:0;padding:0}
@@ -277,7 +279,7 @@ export default function CalendarDark() {
 
       {/* Header */}
       <div style={{ borderBottom:"1px solid #1c1c1c", padding:"14px 24px", display:"flex", alignItems:"center", gap:12 }}>
-        <div style={{ fontFamily:F, fontSize:13, letterSpacing:"0.18em", color:"#444", flex:1, fontWeight:700 }}>
+        <div style={{ fontFamily:F, fontSize:18, letterSpacing:"0.2em", color:"#555", flex:1, fontWeight:800 }}>
           CALENDAR
         </div>
         <div style={{ display:"flex", gap:8, alignItems:"center", position:"relative" }}>
@@ -301,7 +303,7 @@ export default function CalendarDark() {
       <div style={{ flex:1, padding:"22px 24px 0", maxWidth:500, margin:"0 auto", width:"100%" }}>
         <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:20 }}>
           <button className="nav-btn" onClick={prevMonth}>‹</button>
-          <div style={{ flex:1, textAlign:"center", fontSize:15, letterSpacing:"0.1em", color:"#aaa", fontWeight:700 }}>
+          <div style={{ flex:1, textAlign:"center", fontSize:22, letterSpacing:"0.12em", color:"#ccc", fontWeight:800 }}>
             {MONTH_NAMES[viewMonth]} {viewYear}
           </div>
           <button className="nav-btn" onClick={nextMonth}>›</button>

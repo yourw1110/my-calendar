@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">my-calendar</string>
+    <string name="title_activity_main">my-calendar</string>
+    <string name="package_name">com.yuatoz.calendar</string>
+    <string name="custom_url_scheme">com.yuatoz.calendar</string>
+</resources>

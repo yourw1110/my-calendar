@@ -1,0 +1,6 @@
+{
+  "appId": "com.yuatoz.calendar",
+  "appName": "my-calendar",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

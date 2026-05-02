@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { LocalNotifications } from "@capacitor/local-notifications";
 
 const COLORS = [
   { id: "red",     label: "レッド",    bg: "#ff3b3b", dark: "#ff3b3b" },
@@ -6,15 +7,27 @@ const COLORS = [
   { id: "yellow",  label: "イエロー",  bg: "#ffe600", dark: "#ffe600" },
   { id: "green",   label: "グリーン",  bg: "#00e676", dark: "#00e676" },
   { id: "cyan",    label: "シアン",    bg: "#00e5ff", dark: "#00e5ff" },
-  { id: "magenta", label: "マゼンタ",  bg: "#e040fb", dark: "#e040fb" },
+  { id: "pop_pink",   label: "ポップピンク", bg: "#ff4070", dark: "#ff4070" },
+  { id: "pop_purple", label: "ポップパープル", bg: "#4d5fff", dark: "#4d5fff" },
+  { id: "pop_teal",   label: "ポップティール", bg: "#009688", dark: "#009688" },
 ];
 
 const REPEATS = [
-  { id: "none",    label: "一度きり" },
+  { id: "none",    label: "単発" },
   { id: "daily",   label: "毎日" },
   { id: "weekly",  label: "毎週" },
   { id: "monthly", label: "毎月" },
 ];
+
+const HOLIDAYS_2026 = {
+  "2026-01-01": "元日", "2026-01-12": "成人の日", "2026-02-11": "建国記念の日",
+  "2026-02-23": "天皇誕生日", "2026-02-24": "振替休日", "2026-03-20": "春分の日",
+  "2026-04-29": "昭和の日", "2026-05-03": "憲法記念日", "2026-05-04": "みどりの日",
+  "2026-05-05": "こどもの日", "2026-05-06": "振替休日", "2026-07-20": "海の日",
+  "2026-08-11": "山の日", "2026-09-21": "敬老の日", "2026-09-22": "秋分の日",
+  "2026-09-23": "秋分の日", "2026-10-12": "スポーツの日", "2026-11-03": "文化の日",
+  "2026-11-23": "勤労感謝の日", "2026-11-24": "振替休日"
+};
 
 const DAY_NAMES = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
 const MONTH_NAMES = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
@@ -57,7 +70,8 @@ async function apiDelete(id) {
 const defaultForm = {
   title: "", date: toDateStr(new Date()),
   startTime: "10:00", endTime: "11:00",
-  allDay: false, color: "cyan", repeat: "none", memo: ""
+  allDay: false, color: "cyan", repeat: "none", memo: "", address: "",
+  notify: false, notifyTime: "20:00"
 };
 
 const F = "'Noto Sans JP','Hiragino Kaku Gothic ProN','Meiryo',sans-serif";
@@ -79,11 +93,61 @@ export default function CalendarDark() {
   const [menuOpen, setMenuOpen]     = useState(false);
   const importRef = useRef();
 
+  // スワイプ操作用
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+  const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    if (isLeftSwipe) nextMonth();
+    if (isRightSwipe) prevMonth();
+  };
+
+  // ボトムパネルのスワイプ操作用
+  const [pTouchStart, setPTouchStart] = useState(null);
+  const [pTouchEnd, setPTouchEnd] = useState(null);
+  const onPTouchStart = (e) => {
+    setPTouchEnd(null);
+    setPTouchStart(e.targetTouches[0].clientY);
+  };
+  const onPTouchMove = (e) => setPTouchEnd(e.targetTouches[0].clientY);
+  const onPTouchEnd = () => {
+    if (!pTouchStart || !pTouchEnd) return;
+    const distance = pTouchEnd - pTouchStart;
+    if (distance > 70) { // 70px以上下にスワイプで閉じる
+      setSelected(null);
+      setDetailEv(null);
+    }
+  };
+
   useEffect(() => {
     apiGet()
       .then(data => setEvents(data))
       .catch(() => showToast("データの読み込みに失敗しました", "err"))
       .finally(() => setLoading(false));
+
+    // URLパラメータから日付指定があるか確認 (例: ?date=2026-04-20)
+    const params = new URLSearchParams(window.location.search);
+    const d = params.get("date");
+    if (d && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
+      const [y, m] = d.split("-").map(Number);
+      setViewYear(y);
+      setViewMonth(m - 1);
+      setSelected(d);
+    }
+    // 通知権限の要求 (アプリ実行時のみ)
+    if (typeof window !== 'undefined' && window.Capacitor) {
+      LocalNotifications.requestPermissions();
+    }
   }, []);
 
   const showToast = (msg, type = "ok") => {
@@ -106,7 +170,8 @@ export default function CalendarDark() {
       title: ev.title, date: ev.date,
       startTime: ev.startTime || "10:00",
       endTime: ev.endTime || "11:00",
-      allDay: ev.allDay, color: ev.color, repeat: ev.repeat, memo: ev.memo || ""
+      allDay: ev.allDay, color: ev.color, repeat: ev.repeat, memo: ev.memo || "", address: ev.address || "",
+      notify: ev.notify || false, notifyTime: ev.notifyTime || "20:00"
     });
     setEditId(ev.id); setDetailEv(null); setModal("edit");
   };
@@ -114,6 +179,30 @@ export default function CalendarDark() {
 
   const handleSave = async () => {
     if (!form.title.trim()) return;
+    
+    // 通知のスケジュール (アプリ実行時のみ)
+    if (form.notify && typeof window !== 'undefined' && window.Capacitor) {
+      try {
+        const [y, m, d] = form.date.split("-").map(Number);
+        const targetDate = new Date(y, m - 1, d);
+        targetDate.setDate(targetDate.getDate() - 1); // 前日
+        const [nh, nm] = form.notifyTime.split(":").map(Number);
+        targetDate.setHours(nh, nm, 0, 0);
+
+        if (targetDate > new Date()) {
+          await LocalNotifications.schedule({
+            notifications: [{
+              title: "明日の予定",
+              body: `${form.title} (${form.startTime})`,
+              id: Math.floor(Math.random() * 1000000),
+              schedule: { at: targetDate },
+              sound: "default"
+            }]
+          });
+        }
+      } catch (e) { console.error("Notification failed", e); }
+    }
+
     if (modal === "add") {
       const newEv = { ...form, id: genId(), createdAt: Date.now() };
       setEvents(ev => [...ev, newEv]);
@@ -300,7 +389,12 @@ export default function CalendarDark() {
       </div>
 
       {/* Calendar */}
-      <div style={{ flex:1, padding:"22px 24px 0", maxWidth:500, margin:"0 auto", width:"100%" }}>
+      <div 
+        style={{ flex:1, padding:"22px 24px 0", maxWidth:500, margin:"0 auto", width:"100%" }}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
         <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:20 }}>
           <button className="nav-btn" onClick={prevMonth}>‹</button>
           <div style={{ flex:1, textAlign:"center", fontSize:22, letterSpacing:"0.12em", color:"#ccc", fontWeight:800 }}>
@@ -324,16 +418,22 @@ export default function CalendarDark() {
               const ds = `${viewYear}-${pad(viewMonth+1)}-${pad(day)}`;
               const isToday = ds === todayStr;
               const isSel   = ds === selected;
+              const isHoliday = HOLIDAYS_2026[ds];
               const dayEvs  = events.filter(e => eventOccursOnDate(e, ds));
               const wd      = (firstDay + day - 1) % 7;
               return (
                 <div key={ds} style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"4px 0", minHeight:80, borderTop:"1px solid #1c1c1c" }} onClick={() => handleDayClick(ds)}>
                   <div className={`cell-day${isToday?" today":""}${isSel?" selected":""}`}
-                    style={{ color: isToday ? undefined : isSel ? "#e8e8e8" : wd===0?"#993333":wd===6?"#006666":"#aaa" }}>
+                    style={{ color: isToday ? undefined : isSel ? "#e8e8e8" : (wd===0 || isHoliday)?"#993333":wd===6?"#006666":"#aaa" }}>
                     {day}
                   </div>
                   <div className="task-list">
-                    {dayEvs.slice(0, 3).map(e => (
+                    {isHoliday && (
+                      <div className="task-badge" style={{ background: "transparent", color: "#ff3b3b", fontSize: 9, fontWeight: 800, textAlign: "center" }}>
+                        {isHoliday}
+                      </div>
+                    )}
+                    {dayEvs.slice(0, isHoliday ? 2 : 3).map(e => (
                       <div key={e.id} className="task-badge" style={{ background: getColor(e.color).bg }}>
                         {e.title.substring(0, 5)}
                       </div>
@@ -350,7 +450,11 @@ export default function CalendarDark() {
       </div>
 
       {/* Fixed Bottom Panel */}
-      <div className={`bottom-panel${selected ? " open" : ""}`}>
+      <div className={`bottom-panel${selected ? " open" : ""}`}
+        onTouchStart={onPTouchStart}
+        onTouchMove={onPTouchMove}
+        onTouchEnd={onPTouchEnd}
+      >
         <div onClick={() => { setSelected(null); setDetailEv(null); }}>
           <div className="panel-handle" />
         </div>
@@ -381,7 +485,12 @@ export default function CalendarDark() {
                   </div>
                 </div>
                 <div style={{ fontSize:16, color:"#e8e8e8", fontWeight:700, marginBottom:5, lineHeight:1.5 }}>{detailEv.title}</div>
-                <div style={{ fontSize:12, color:"#555", marginBottom: detailEv.memo ? 8 : 0 }}>{fmtTime(detailEv)}</div>
+                <div style={{ fontSize:12, color:"#555", marginBottom: (detailEv.memo || detailEv.address) ? 8 : 0 }}>{fmtTime(detailEv)}</div>
+                {detailEv.address && (
+                  <div style={{ fontSize:13, color:"#aaa", display:"flex", alignItems:"center", gap:4, marginBottom: detailEv.memo ? 6 : 0 }}>
+                    <span style={{ fontSize:10 }}>📍</span> {detailEv.address}
+                  </div>
+                )}
                 {detailEv.memo && (
                   <div style={{ fontSize:13, color:"#777", borderTop:"1px solid #1c1c1c", paddingTop:8, lineHeight:1.8, marginTop:4 }}>{detailEv.memo}</div>
                 )}
@@ -428,7 +537,14 @@ export default function CalendarDark() {
               <div style={{ display:"flex", gap:9, marginBottom:13 }}>
                 <div style={{ flex:1 }}>
                   <label className="form-label">START</label>
-                  <input className="form-input" type="time" value={form.startTime} onChange={e=>setForm(f=>({...f,startTime:e.target.value}))} />
+                  <input className="form-input" type="time" value={form.startTime} onChange={e=>{
+                    const newStart = e.target.value;
+                    setForm(f => {
+                      const [h, m] = newStart.split(":").map(Number);
+                      const newEnd = `${pad((h + 1) % 24)}:${pad(m)}`;
+                      return { ...f, startTime: newStart, endTime: newEnd };
+                    });
+                  }} />
                 </div>
                 <div style={{ flex:1 }}>
                   <label className="form-label">END</label>
@@ -437,9 +553,10 @@ export default function CalendarDark() {
               </div>
             )}
             <div style={{ marginBottom:13 }}>
-              <label style={{ display:"flex", alignItems:"center", gap:7, cursor:"pointer", fontSize:13, color:"#666", fontWeight:400 }}>
-                <input type="checkbox" checked={form.allDay} onChange={e=>setForm(f=>({...f,allDay:e.target.checked}))} style={{ accentColor:"#e8e8e8", width:14, height:14 }} />
-                終日
+              <label style={{ display:"flex", alignItems:"center", gap:8, cursor:"pointer", fontSize:14, color:"#ccc", fontWeight:700 }}>
+                <input type="checkbox" checked={form.allDay} onChange={e=>setForm(f=>({...f,allDay:e.target.checked}))} 
+                  style={{ accentColor:"#00e5ff", width:18, height:18, cursor:"pointer" }} />
+                ALL DAY
               </label>
             </div>
             <div style={{ marginBottom:13 }}>
@@ -460,10 +577,23 @@ export default function CalendarDark() {
                 ))}
               </div>
             </div>
-            <div style={{ marginBottom:20 }}>
+            <div style={{ marginBottom:13 }}>
               <label className="form-label">MEMO</label>
               <textarea className="form-input" value={form.memo} onChange={e=>setForm(f=>({...f,memo:e.target.value}))} placeholder="メモ（任意）" />
             </div>
+            <div style={{ marginBottom:13, borderTop: "1px solid #2a2a2a", paddingTop: 13 }}>
+              <label style={{ display:"flex", alignItems:"center", gap:8, cursor:"pointer", fontSize:13, color: form.notify ? "#00e5ff" : "#666" }}>
+                <input type="checkbox" checked={form.notify} onChange={e=>setForm(f=>({...f,notify:e.target.checked}))} style={{ width:16, height:16 }} />
+                前日に通知する
+              </label>
+              {form.notify && (
+                <div style={{ marginTop: 8 }}>
+                  <label className="form-label">NOTIFICATION TIME</label>
+                  <input className="form-input" type="time" value={form.notifyTime} onChange={e=>setForm(f=>({...f,notifyTime:e.target.value}))} />
+                </div>
+              )}
+            </div>
+
             <button className="save-btn" onClick={handleSave}>保存する</button>
             <span className="cancel-link" onClick={closeModal}>キャンセル</span>
           </div>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/day_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="2dp">
+
+    <TextView
+        android:id="@+id/day_text"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:gravity="center"
+        android:text="1"
+        android:textColor="#aaa"
+        android:textSize="10sp" />
+
+    <!-- タスクを表示するドット群 -->
+    <LinearLayout
+        android:id="@+id/task_dots"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="1dp">
+        <!-- コードから動的にドットを追加するのは難しいため、固定のドットを用意して表示/非表示を切り替えます -->
+        <View
+            android:id="@+id/dot1"
+            android:layout_width="3dp"
+            android:layout_height="3dp"
+            android:background="#00e5ff"
+            android:visibility="gone"
+            android:layout_margin="0.5dp" />
+        <View
+            android:id="@+id/dot2"
+            android:layout_width="3dp"
+            android:layout_height="3dp"
+            android:background="#ff3b3b"
+            android:visibility="gone"
+            android:layout_margin="0.5dp" />
+        <View
+            android:id="@+id/dot3"
+            android:layout_width="3dp"
+            android:layout_height="3dp"
+            android:background="#ffe600"
+            android:visibility="gone"
+            android:layout_margin="0.5dp" />
+    </LinearLayout>
+</LinearLayout>

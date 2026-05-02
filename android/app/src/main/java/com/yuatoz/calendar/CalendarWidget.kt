@@ -6,67 +6,102 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.widget.RemoteViews
-import java.text.SimpleDateFormat
+import org.json.JSONArray
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.*
+import com.yuatoz.calendar.R
+import kotlin.concurrent.thread
 
 class CalendarWidget : AppWidgetProvider() {
 
+    companion object {
+        const val ACTION_PREV = "com.yuatoz.calendar.ACTION_PREV"
+        const val ACTION_NEXT = "com.yuatoz.calendar.ACTION_NEXT"
+    }
+
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+        // 1. 即座に更新
         for (appWidgetId in appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId)
+            updateWidget(context, appWidgetManager, appWidgetId)
+        }
+
+        // 2. 非同期で予定を取得して永続化
+        thread {
+            try {
+                val connection = URL("https://calendar.yuatoz.com/api/events").openConnection() as HttpURLConnection
+                connection.connectTimeout = 3000
+                if (connection.responseCode == 200) {
+                    val response = connection.inputStream.bufferedReader().use { it.readText() }
+                    // 端末内に保存
+                    val prefs = context.getSharedPreferences("widget_prefs", Context.MODE_PRIVATE)
+                    prefs.edit().putString("events_json", response).apply()
+                    
+                    // 全ウィジェットを再描画
+                    val manager = AppWidgetManager.getInstance(context)
+                    val ids = manager.getAppWidgetIds(ComponentName(context, CalendarWidget::class.java))
+                    manager.notifyAppWidgetViewDataChanged(ids, R.id.calendar_grid)
+                }
+            } catch (e: Exception) { e.printStackTrace() }
         }
     }
 
-    private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
-        val views = RemoteViews(context.packageName, R.layout.calendar_widget)
-        
-        val now = Calendar.getInstance()
-        val year = now.get(Calendar.YEAR)
-        val month = now.get(Calendar.MONTH)
-        val today = now.get(Calendar.DAY_OF_MONTH)
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+        val appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+        if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) return
 
-        // ヘッダー表示 (例: 2026.05)
-        views.setTextViewText(R.id.widget_date, String.format("%d.%02d", year, month + 1))
+        val prefs = context.getSharedPreferences("widget_prefs", Context.MODE_PRIVATE)
+        var offset = prefs.getInt("offset_$appWidgetId", 0)
 
-        // カレンダーグリッドの生成
-        val calendarText = generateCalendarGrid(year, month, today)
-        views.setTextViewText(R.id.calendar_grid_text, calendarText)
-
-        // タップでアプリを起動
-        val intent = Intent(context, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        views.setOnClickPendingIntent(R.id.widget_container, pendingIntent)
-
-        // 更新を実行
-        AppWidgetManager.getInstance(context).updateAppWidget(appWidgetId, views)
-    }
-
-    private fun generateCalendarGrid(year: Int, month: Int, today: Int): String {
-        val cal = Calendar.getInstance()
-        cal.set(year, month, 1)
-        val firstDayOfWeek = cal.get(Calendar.DAY_OF_WEEK) // 1:SUN, 2:MON...
-        val maxDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
-
-        val grid = StringBuilder()
-        
-        // 初日の前を空白で埋める (1マス3文字分 "   ")
-        for (i in 1 until firstDayOfWeek) {
-            grid.append("   ")
-        }
-
-        for (day in 1..maxDay) {
-            // 今日の日付は [ ] で囲むなどの表現も可能だが、ここではシンプルに数字を表示
-            // 等幅にするため2桁にパディング
-            val dayStr = String.format("%2d ", day)
-            grid.append(dayStr)
-
-            // 土曜日で改行 (firstDayOfWeek + day - 1) が 7 の倍数
-            if ((firstDayOfWeek + day - 1) % 7 == 0) {
-                grid.append("\n")
+        when (intent.action) {
+            ACTION_PREV -> {
+                prefs.edit().putInt("offset_$appWidgetId", offset - 1).apply()
+                updateWidget(context, AppWidgetManager.getInstance(context), appWidgetId)
+            }
+            ACTION_NEXT -> {
+                prefs.edit().putInt("offset_$appWidgetId", offset + 1).apply()
+                updateWidget(context, AppWidgetManager.getInstance(context), appWidgetId)
             }
         }
+    }
+
+    private fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
+        val views = RemoteViews(context.packageName, R.layout.calendar_widget)
+
+        val prefs = context.getSharedPreferences("widget_prefs", Context.MODE_PRIVATE)
+        val offset = prefs.getInt("offset_$appWidgetId", 0)
+        val cal = Calendar.getInstance()
+        cal.add(Calendar.MONTH, offset)
         
-        return grid.toString()
+        // Month Header in English (e.g., APR 2026)
+        val months = arrayOf("JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC")
+        views.setTextViewText(R.id.widget_date_header, "${months[cal.get(Calendar.MONTH)]} ${cal.get(Calendar.YEAR)}")
+
+        views.setOnClickPendingIntent(R.id.btn_prev, getPendingSelfIntent(context, ACTION_PREV, appWidgetId))
+        views.setOnClickPendingIntent(R.id.btn_next, getPendingSelfIntent(context, ACTION_NEXT, appWidgetId))
+
+        val serviceIntent = Intent(context, CalendarWidgetService::class.java).apply {
+            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+            data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
+        }
+        views.setRemoteAdapter(R.id.calendar_grid, serviceIntent)
+
+        val clickIntent = Intent(context, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
+        views.setPendingIntentTemplate(R.id.calendar_grid, pendingIntent)
+
+        appWidgetManager.updateAppWidget(appWidgetId, views)
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.calendar_grid)
+    }
+
+    private fun getPendingSelfIntent(context: Context, action: String, appWidgetId: Int): PendingIntent {
+        val intent = Intent(context, javaClass).apply {
+            this.action = action
+            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+        }
+        return PendingIntent.getBroadcast(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 }
